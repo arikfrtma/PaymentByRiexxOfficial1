@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Gateway</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #6e8efb 0%, #4a6cf7 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .payment-options {
+            padding: 30px;
+        }
+        
+        .payment-method {
+            margin-bottom: 25px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border: 1px solid #eee;
+        }
+        
+        .payment-method:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .method-header {
+            background: #f9f9f9;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .method-header:hover {
+            background: #f1f1f1;
+        }
+        
+        .method-header.active {
+            background: linear-gradient(135deg, #6e8efb 0%, #4a6cf7 100%);
+            color: white;
+        }
+        
+        .method-icon {
+            width: 40px;
+            height: 40px;
+            margin-right: 15px;
+            object-fit: contain;
+        }
+        
+        .method-title {
+            font-size: 18px;
+            font-weight: 500;
+            flex-grow: 1;
+        }
+        
+        .method-arrow {
+            width: 20px;
+            transition: transform 0.3s ease;
+        }
+        
+        .method-arrow.active {
+            transform: rotate(180deg);
+            filter: brightness(0) invert(1);
+        }
+        
+        .method-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out, padding 0.3s ease;
+        }
+        
+        .method-content.active {
+            max-height: 500px;
+            padding: 20px;
+        }
+        
+        .payment-details {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .detail-row {
+            display: flex;
+            align-items: center;
+        }
+        
+        .detail-label {
+            width: 120px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .detail-value {
+            flex-grow: 1;
+            background: #f5f5f5;
+            padding: 12px 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            position: relative;
+        }
+        
+        .copy-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #4a6cf7;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 3px 8px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .copy-btn:hover {
+            background: #3a5ce4;
+        }
+        
+        .qris-image {
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+            display: block;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .qris-image:hover {
+            transform: scale(1.03);
+        }
+        
+        .confirm-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #6e8efb 0%, #4a6cf7 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(74, 108, 247, 0.3);
+        }
+        
+        .confirm-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(74, 108, 247, 0.4);
+        }
+        
+        .confirm-btn:active {
+            transform: translateY(0);
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: #777;
+            border-top: 1px solid #eee;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 10px;
+            }
+            
+            .header {
+                padding: 20px 15px;
+            }
+            
+            .header h1 {
+                font-size: 22px;
+            }
+            
+            .payment-options {
+                padding: 20px 15px;
+            }
+            
+            .detail-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+            
+            .detail-label {
+                width: 100%;
+            }
+            
+            .detail-value {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Payment Gateway</h1>
+            <p>Pilih metode pembayaran yang Anda inginkan</p>
+        </div>
+        
+        <div class="payment-options">
+            <!-- QRIS Method -->
+            <div class="payment-method">
+                <div class="method-header" onclick="toggleMethod(this)">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/QR_code_for_mobile_English_Wikipedia.svg/1200px-QR_code_for_mobile_English_Wikipedia.svg.png" alt="QRIS" class="method-icon">
+                    <div class="method-title">QRIS</div>
+                    <img src="https://cdn-icons-png.flaticon.com/512/32/32195.png" alt="Arrow" class="method-arrow">
+                </div>
+                <div class="method-content">
+                    <div class="payment-details">
+                        <img src="https://files.catbox.moe/ewbn62.jpg" alt="QRIS Code" class="qris-image">
+                        <p style="text-align: center; margin-top: 10px;">Scan QR code di atas untuk melakukan pembayaran</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- DANA Method -->
+            <div class="payment-method">
+                <div class="method-header" onclick="toggleMethod(this)">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/7/72/Logo_dana_blue.svg" alt="DANA" class="method-icon">
+                    <div class="method-title">DANA</div>
+                    <img src="https://cdn-icons-png.flaticon.com/512/32/32195.png" alt="Arrow" class="method-arrow">
+                </div>
+                <div class="method-content">
+                    <div class="payment-details">
+                        <div class="detail-row">
+                            <div class="detail-label">Nomor DANA</div>
+                            <div class="detail-value">
+                                083179572446
+                                <button class="copy-btn" onclick="copyToClipboard('083179572446')">Salin</button>
+                            </div>
+                        </div>
+                        <p style="font-size: 14px; color: #666; margin-top: 10px;">Gunakan nomor di atas untuk transfer melalui aplikasi DANA</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- OVO Method -->
+            <div class="payment-method">
+                <div class="method-header" onclick="toggleMethod(this)">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/e/eb/Logo_ovo_purple.svg" alt="OVO" class="method-icon">
+                    <div class="method-title">OVO</div>
+                    <img src="https://cdn-icons-png.flaticon.com/512/32/32195.png" alt="Arrow" class="method-arrow">
+                </div>
+                <div class="method-content">
+                    <div class="payment-details">
+                        <div class="detail-row">
+                            <div class="detail-label">Nomor OVO</div>
+                            <div class="detail-value">
+                                083179572446
+                                <button class="copy-btn" onclick="copyToClipboard('083179572446')">Salin</button>
+                            </div>
+                        </div>
+                        <p style="font-size: 14px; color: #666; margin-top: 10px;">Gunakan nomor di atas untuk transfer melalui aplikasi OVO</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- GoPay Method -->
+            <div class="payment-method">
+                <div class="method-header" onclick="toggleMethod(this)">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/8/86/Gopay_logo.svg" alt="GoPay" class="method-icon">
+                    <div class="method-title">GoPay</div>
+                    <img src="https://cdn-icons-png.flaticon.com/512/32/32195.png" alt="Arrow" class="method-arrow">
+                </div>
+                <div class="method-content">
+                    <div class="payment-details">
+                        <div class="detail-row">
+                            <div class="detail-label">Nomor GoPay</div>
+                            <div class="detail-value">
+                                083898472764
+                                <button class="copy-btn" onclick="copyToClipboard('083898472764')">Salin</button>
+                            </div>
+                        </div>
+                        <p style="font-size: 14px; color: #666; margin-top: 10px;">Gunakan nomor di atas untuk transfer melalui aplikasi GoPay</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- BRI Method -->
+            <div class="payment-method">
+                <div class="method-header" onclick="toggleMethod(this)">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/7/7f/Bank_BRI_logo.svg" alt="BRI" class="method-icon">
+                    <div class="method-title">Bank BRI</div>
+                    <img src="https://cdn-icons-png.flaticon.com/512/32/32195.png" alt="Arrow" class="method-arrow">
+                </div>
+                <div class="method-content">
+                    <div class="payment-details">
+                        <div class="detail-row">
+                            <div class="detail-label">Nomor Rekening</div>
+                            <div class="detail-value">
+                                016601091431503
+                                <button class="copy-btn" onclick="copyToClipboard('016601091431503')">Salin</button>
+                            </div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Nama Penerima</div>
+                            <div class="detail-value">
+                                (Silakan tanyakan via WhatsApp)
+                            </div>
+                        </div>
+                        <p style="font-size: 14px; color: #666; margin-top: 10px;">Gunakan nomor rekening di atas untuk transfer melalui Bank BRI</p>
+                    </div>
+                </div>
+            </div>
+            
+            <a href="https://wa.me/6283898472764?text=bang+mau+kirim+bukti+tf" class="confirm-btn">
+                Konfirmasi Pembayaran
+            </a>
+        </div>
+        
+        <div class="footer">
+            <p>Setelah melakukan pembayaran, harap konfirmasi dengan mengklik tombol di atas</p>
+        </div>
+    </div>
+
+    <script>
+        function toggleMethod(header) {
+            const content = header.nextElementSibling;
+            const arrow = header.querySelector('.method-arrow');
+            
+            header.classList.toggle('active');
+            content.classList.toggle('active');
+            arrow.classList.toggle('active');
+        }
+        
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Teks berhasil disalin: ' + text);
+            }).catch(err => {
+                console.error('Gagal menyalin teks: ', err);
+            });
+        }
+        
+        // Open first method by default
+        document.addEventListener('DOMContentLoaded', function() {
+            const firstMethod = document.querySelector('.method-header');
+            toggleMethod(firstMethod);
+        });
+    </script>
+</body>
+</html>
